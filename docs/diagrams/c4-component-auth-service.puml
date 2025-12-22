@@ -1,0 +1,32 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(auth_service, "User & Auth Service", "Go", "Аутентификация, авторизация, профили")
+
+Container(auth_service, "User & Auth Service") {
+    Component(grpc_server, "gRPC Server", "gRPC", "API для Gateway и BFF")
+    Component(auth_controller, "Auth Controller", "Бизнес-логика", "Аутентификация")
+    Component(user_controller, "User Controller", "Бизнес-логика", "Управление пользователями")
+    Component(profile_controller, "Profile Controller", "Бизнес-логика", "Управление профилями")
+    Component(repository, "Repository", "Data Access", "Доступ к данным")
+}
+
+ContainerDb(user_db, "User Database", "PostgreSQL", "Хранит пользователей, токены, сессии")
+Container_Ext(api_gateway, "API Gateway", "Nginx", "Внешний шлюз")
+Container_Ext(bff_gateway, "BFF Gateway", "Go/Java", "Backend for frontend")
+
+' API Gateway для аутентификации
+Rel(api_gateway, grpc_server, "Проверка токенов", "gRPC")
+Rel(grpc_server, auth_controller, "Валидация/генерация токенов", "")
+
+' BFF для управления пользователями
+Rel(bff_gateway, grpc_server, "Управление профилями", "gRPC")
+Rel(grpc_server, user_controller, "CRUD пользователей", "")
+Rel(grpc_server, profile_controller, "Обновление профилей", "")
+
+' Доступ к данным
+Rel(auth_controller, repository, "Проверка учетных данных", "")
+Rel(user_controller, repository, "Операции с пользователями", "")
+Rel(profile_controller, repository, "Обновление профилей", "")
+Rel(repository, user_db, "SQL запросы", "SQL")
+@enduml

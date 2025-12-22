@@ -1,0 +1,32 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(bff_gateway, "BFF Gateway", "Go/Java", "Backend for frontend")
+
+Container(bff_gateway, "BFF Gateway") {
+    Component(http_handler, "HTTP Handler", "REST API", "Прием запросов от API Gateway")
+    Component(auth_validator, "Auth Validator", "JWT", "Проверка авторизации")
+    Component(device_client, "Device Client", "gRPC", "Клиент к Device Catalog")
+    Component(telemetry_client, "Telemetry Client", "gRPC", "Клиент к Telemetry Service")
+    Component(automation_client, "Automation Client", "gRPC", "Клиент к Automation Service")
+    Component(response_builder, "Response Builder", "JSON", "Формирование ответов")
+}
+
+Container_Ext(api_gateway, "API Gateway", "Nginx", "Внешний шлюз")
+Container_Ext(device_catalog, "Device Catalog", "Go", "Сервис устройств")
+Container_Ext(telemetry_service, "Telemetry Service", "Go", "Сервис телеметрии")
+Container_Ext(automation_service, "Automation Service", "Go", "Сервис автоматизации")
+
+Rel(api_gateway, http_handler, "Передает запросы", "HTTPS")
+Rel(http_handler, auth_validator, "Проверяет токен", "")
+Rel(auth_validator, device_client, "Запрашивает данные устройств", "")
+Rel(auth_validator, telemetry_client, "Запрашивает телеметрию", "")
+Rel(auth_validator, automation_client, "Управляет сценариями", "")
+Rel(device_client, device_catalog, "gRPC вызовы", "gRPC")
+Rel(telemetry_client, telemetry_service, "gRPC вызовы", "gRPC")
+Rel(automation_client, automation_service, "gRPC вызовы", "gRPC")
+Rel(device_client, response_builder, "Данные устройств", "")
+Rel(telemetry_client, response_builder, "Данные телеметрии", "")
+Rel(automation_client, response_builder, "Статус сценариев", "")
+Rel(response_builder, http_handler, "Формированный ответ", "")
+@enduml

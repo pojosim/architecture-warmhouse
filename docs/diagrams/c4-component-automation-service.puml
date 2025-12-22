@@ -1,0 +1,24 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(automation_service, "Automation Service", "Go", "Сценарии автоматизации")
+
+Container(automation_service, "Automation Service") {
+    Component(grpc_server, "gRPC Server", "gRPC", "API для управления сценариями")
+    Component(scenario_engine, "Scenario Engine", "Бизнес-логика", "Выполнение правил")
+    Component(scenario_repository, "Scenario Repository", "Data Access", "Хранение правил")
+    Component(event_handler, "Event Handler", "AMQP", "Обработка событий")
+}
+
+ContainerDb(automation_db, "Automation DB", "PostgreSQL", "Хранит сценарии")
+Container_Ext(event_broker, "Event Message Broker", "RabbitMQ", "Брокер событий")
+Container_Ext(bff_gateway, "BFF Gateway", "Go/Java", "Клиент сервиса")
+
+Rel(bff_gateway, grpc_server, "Управление сценариями", "gRPC")
+Rel(grpc_server, scenario_repository, "CRUD операций", "")
+Rel(scenario_repository, automation_db, "SQL запросы", "SQL")
+Rel(event_broker, event_handler, "События устройств", "AMQP")
+Rel(event_handler, scenario_engine, "Триггеры для правил", "")
+Rel(scenario_engine, scenario_repository, "Загрузка правил", "")
+Rel(scenario_engine, event_broker, "Публикация команд", "AMQP")
+@enduml

@@ -1,0 +1,24 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(telemetry_service, "Telemetry Service", "Go", "Сбор телеметрии")
+
+Container(telemetry_service, "Telemetry Service") {
+    Component(grpc_server, "gRPC Server", "gRPC", "Прием запросов от BFF")
+    Component(data_ingestor, "Data Ingestor", "AMQP", "Прием данных от брокера")
+    Component(query_processor, "Query Processor", "Бизнес-логика", "Обработка запросов")
+    Component(telemetry_repository, "Telemetry Repository", "Data Access", "Доступ к данным")
+}
+
+ContainerDb(telemetry_db, "Telemetry Database", "TimeSeriesDB", "Хранит временные ряды датчиков")
+Container_Ext(event_broker, "Event Message Broker", "RabbitMQ", "Брокер событий")
+Container_Ext(bff_gateway, "BFF Gateway", "Go/Java", "Клиент сервиса")
+
+Rel(bff_gateway, grpc_server, "Запросы телеметрии", "gRPC")
+Rel(grpc_server, query_processor, "Обработка запросов", "")
+Rel(query_processor, telemetry_repository, "Запросы данных", "")
+Rel(telemetry_repository, telemetry_db, "SQL/Influx запросы", "SQL/InfluxQL")
+Rel(event_broker, data_ingestor, "События телеметрии", "AMQP")
+Rel(data_ingestor, telemetry_repository, "Сохранение данных", "")
+Rel(data_ingestor, query_processor, "Real-time обновления", "")
+@enduml

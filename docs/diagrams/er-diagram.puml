@@ -1,0 +1,91 @@
+@startuml
+entity "User" {
+  * id : UUID <<PK>>
+  --
+  * email : VARCHAR(255)
+  * password_hash : VARCHAR(255)
+  full_name : VARCHAR(255)
+  created_at : TIMESTAMP
+  is_active : BOOLEAN
+}
+
+entity "House" {
+  * id : UUID <<PK>>
+  --
+  * user_id : UUID <<FK>>
+  * name : VARCHAR(255)
+  address : TEXT
+}
+
+entity "DeviceType" {
+  * id : UUID <<PK>>
+  --
+  * name : VARCHAR(100)
+  * protocol : VARCHAR(50)
+  capabilities : JSONB
+}
+
+entity "Device" {
+  * id : UUID <<PK>>
+  --
+  * device_type_id : UUID <<FK>>
+  * house_id : UUID <<FK>>
+  * serial_number : VARCHAR(100)
+  name : VARCHAR(100)
+  * status : VARCHAR(20)
+  config : JSONB
+}
+
+entity "TelemetryData" {
+  * id : UUID <<PK>>
+  --
+  * device_id : UUID <<FK>>
+  * timestamp : TIMESTAMP
+  * metric : VARCHAR(50)
+  * value : DECIMAL(10,4)
+  unit : VARCHAR(20)
+}
+
+entity "DeviceCommand" {
+  * id : UUID <<PK>>
+  --
+  * device_id : UUID <<FK>>
+  * command : VARCHAR(50)
+  parameters : JSONB
+  * status : VARCHAR(20)
+  created_at : TIMESTAMP
+}
+
+entity "AutomationRule" {
+  * id : UUID <<PK>>
+  --
+  * user_id : UUID <<FK>>
+  * device_id : UUID <<FK>>
+  name : VARCHAR(100)
+  trigger_type : VARCHAR(50)
+  trigger_config : JSONB
+  action_type : VARCHAR(50)
+  action_config : JSONB
+  is_active : BOOLEAN
+}
+
+entity "Module" {
+  * id : UUID <<PK>>
+  --
+  * house_id : UUID <<FK>>
+  * type : VARCHAR(50)
+  ip_address : VARCHAR(45)
+  status : VARCHAR(20)
+  last_seen : TIMESTAMP
+}
+
+' Связи
+User ||--o{ House : "owns"
+House ||--o{ Device : "contains"
+House ||--o{ Module : "has"
+DeviceType ||--o{ Device : "classifies"
+Device ||--o{ TelemetryData : "generates"
+Device ||--o{ DeviceCommand : "receives"
+User ||--o{ AutomationRule : "creates"
+Device ||--o{ AutomationRule : "controlled_by"
+@enduml
