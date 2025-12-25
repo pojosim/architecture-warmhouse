@@ -1,0 +1,19 @@
+### GET temperature from sensor
+GET http://localhost:8081/temperature?location=kitch
+###
+
+### GET all sensors
+GET http://localhost:8080/api/v1/sensors
+###
+
+### CREATE sensor
+POST http://localhost:8080/api/v1/sensors
+Content-Type: application/json
+
+{
+    "name": "Living Room Temperature",
+    "type": "temperature",
+    "location": "Living Room",
+    "unit": "°C"
+}
+###
