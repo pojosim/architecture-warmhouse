@@ -1,0 +1,19 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(device_discovery, "Device Discovery", "Go", "Управляет регистрацией новых модулей умного дома")
+
+Container(device_discovery, "Device Discovery") {
+    Component(http_server, "HTTP Server", "HTTP", "Прием регистраций от модулей управления")
+    Component(device_validator, "Device Validator", "Валидация", "Проверка корректности устройств")
+    Component(registration_handler, "Registration Handler", "Обработчик", "Обработка регистраций")
+}
+
+Container_Ext(smart_module, "Модуль управления", "Проприетарная", "Локальный MQTT брокер")
+Container_Ext(device_catalog, "Device Catalog", "Go", "Каталог устройств")
+
+Rel(smart_module, http_server, "Регистрирует себя", "HTTPS")
+Rel(http_server, device_validator, "Передает данные модуля", "")
+Rel(device_validator, registration_handler, "Валидированные данные", "")
+Rel(registration_handler, device_catalog, "Регистрирует новый модуль", "gRPC")
+@enduml

@@ -1,0 +1,103 @@
+syntax = "proto3";
+
+package api.v1;
+
+import "google/protobuf/timestamp.proto";
+
+service DeviceCatalogService {
+  // Для BFF Gateway
+  rpc GetDevice(GetDeviceRequest) returns (DeviceResponse);
+  rpc ListDevices(ListDevicesRequest) returns (ListDevicesResponse);
+  rpc UpdateDevice(UpdateDeviceRequest) returns (DeviceResponse);
+  rpc DeleteDevice(DeleteDeviceRequest) returns (DeleteDeviceResponse);
+  rpc SendDeviceCommand(SendDeviceCommandRequest) returns (SendDeviceCommandResponse);
+
+  // Для Device Discovery
+  rpc RegisterModule(RegisterModuleRequest) returns (RegisterModuleResponse);
+  rpc RegisterDevice(RegisterDeviceRequest) returns (RegisterDeviceResponse);
+}
+
+message GetDeviceRequest {
+  string device_id = 2;
+}
+
+message ListDevicesRequest {
+  string house_id = 1;
+  optional string device_type_id = 2;
+  optional string status = 3;
+}
+
+message UpdateDeviceRequest {
+  string device_id = 1;
+  optional string house_id = 2;
+  optional string name = 3;
+  optional string status = 4;
+  optional string config = 5;
+}
+
+message DeleteDeviceRequest {
+  string device_id = 1;
+}
+
+message SendDeviceCommandRequest {
+  string device_id = 1;
+  string command = 2;
+  map<string, string> parameters = 3;
+}
+
+message RegisterModuleRequest {
+  string module_id = 1;
+  string house_id = 2;
+  string type = 3;
+  string ip_address = 4;
+  string status = 5;
+}
+
+message RegisterDeviceRequest {
+  string module_id = 1;
+  DeviceInfo device = 2;
+}
+
+message DeviceResponse {
+  Device device = 1;
+}
+
+message ListDevicesResponse {
+  repeated Device devices = 1;
+}
+
+message DeleteDeviceResponse {
+  bool success = 1;
+}
+
+message SendDeviceCommandResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message RegisterModuleResponse {
+  string module_id = 1;
+  bool success = 2;
+}
+
+message RegisterDeviceResponse {
+  string device_id = 1;
+  bool success = 2;
+}
+
+message DeviceInfo {
+  string house_id = 1;
+  Device device = 2;
+}
+
+message Device {
+  string id = 1;
+  string device_type_id = 2;
+  string serial_number = 3;
+  string name = 4;
+  string status = 5;
+  string config = 6;
+  string protocol = 7;
+  repeated string capabilities = 8;
+}
+

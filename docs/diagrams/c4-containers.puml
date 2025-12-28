@@ -1,0 +1,75 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(user, "Пользователь", "Пользователь умного дома")
+
+System_Boundary(smart_home, "Архитектура Умного Дома") {
+    'Инфраструктурный слой
+    Container(api_gateway, "API Gateway", "Подсистема: Nginx", "TLS, Маршрутизация, rate limiting")
+    Container(bff_gateway, "BFF Gateway", "Подсистема: Go/Java", "Backend for frontend")
+    Container(event_message_broker, "Event Message Broker", "Подсистема: RabbitMQ/Kafka", "Асинхронная коммуникация")
+
+    'Клиентский слой
+    Container(web_service, "Web application", "Подсистема: JavaScript/React", "Предоставляет доступ к системе управления умного дома через браузер")
+    Container(mobile_service, "Mobile application", "Подсистема: Kotlin/Swift", "Предоставляет доступ к системе управления умного дома через мобильный клиент")
+
+    'Домен Пользователь и безопасность
+    Container(auth_service, "Auth Service", "Подсистема: Go", "Аутентификация (OAuth2/JWT), профили пользователей")
+    ContainerDb(user_db, "User Database", "PostgresSQL", "Хранит профили пользователей, роли")
+
+    'Домен Управление устройствами
+    Container(device_catalog, "Device Catalog", "Подсистема: Go", "Хранение данных по устройствам")
+    Container(device_controller, "Device Controller", "Подсистема: Go", "Управление устройствами")
+    ContainerDb(device_db, "Device Database", "Подсистема: PostgresSQL", "Хранит устройства, конфигурации")
+    Container(device_discovery, "Device Discovery", "Подсистема: Go", "Управляет регистрацией новых модулей умного дома")
+
+    'Домен Автоматизация сценариев
+    Container(automation_service, "Automation Service", "Подсистема: Go", "Сценарии автоматизации")
+    ContainerDb(automation_db, "Automation DB", "Подсистема: PostgresSQL", "Хранит данные по сценариям")
+
+    'Домен Телеметрия
+    Container(telemetry_service, "Telemetry Service", "Подсистема: Go", "Сбор телеметрии")
+    ContainerDb(telemetry_db, "Telemetry Database", "Подсистема: TimeSeriesDB", "Хранит временные ряды датчиков")
+}
+
+Container_Ext(smart_module, "Модуль управления", "", "Локальный MQTT брокер")
+Container_Ext(device1, "Датчик температуры", "Подсистема: Zigbee", "Измерение температуры")
+Container_Ext(device2, "Реле отопления", "Подсистема: Zigbee", "Управление питанием")
+
+'Клиентское взаимодействие
+Rel(user, web_service, "Просматривает статусы датчиков, управляет сценариями, включается выключает устройства умного дома", "JSON/HTTPS")
+Rel(user, mobile_service, "Просматривает статусы датчиков, управляет сценариями, включается выключает устройства умного дома", "JSON/HTTPS")
+Rel(mobile_service, api_gateway, "Перенаправляет запросы", "HTTPS")
+Rel(web_service, api_gateway, "Перенаправляет запросы", "HTTPS")
+
+'Маршрутизация
+Rel(api_gateway, bff_gateway, "Перенаправляет запросы", "HTTPS")
+Rel(api_gateway, auth_service, "Аутентификация", "HTTPS")
+Rel(bff_gateway, device_catalog, "Данные устройств", "gRPC")
+Rel(bff_gateway, telemetry_service, "Исторические данные", "gRPC")
+Rel(bff_gateway, automation_service, "Сценарии", "gRPC")
+
+'Авторизация
+Rel(auth_service, user_db, "CRUD пользователей", "SQL")
+
+'Управление устройствами
+Rel(device_catalog, device_db, "CRUD устройств", "SQL")
+Rel(device_catalog, event_message_broker, "Публикует команды устройств, Подписывается на состояние устройств", "AMQP")
+Rel(device_controller, event_message_broker, "Публикует события и состояние устройств, Подписывается на команды устройств", "AMQP")
+Rel(device_discovery, device_catalog, "Регистрирует модуль, устройство", "gRPC")
+
+'Автоматизация
+Rel(automation_service, event_message_broker, "Публикует команды устройств", "AMQP")
+Rel(automation_service, automation_db, "CRUD сценариев", "SQL")
+
+'Домен Телеметрия
+Rel(telemetry_service, telemetry_db, "Читает/записывает", "SQL")
+Rel(telemetry_service, event_message_broker, "Подписывается на события устройств", "AMQP")
+
+'Внешние устройства
+Rel(smart_module, device_discovery, "Регистрирует модуль, устройство", "HTTPS")
+Rel(smart_module, device_controller, "Отправка данных, публикация состояний", "MQTT")
+Rel(device_controller, smart_module, "Отправка команд", "MQTT")
+Rel(device1, smart_module, "Отправка данных", "Zigbee")
+Rel(device2, smart_module, "Публикация состояния", "Zigbee")
+@enduml

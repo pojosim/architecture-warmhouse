@@ -1,0 +1,26 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(device_catalog, "Device Catalog", "Go", "Хранение данных по устройствам")
+
+Container(device_catalog, "Device Catalog") {
+    Component(grpc_server, "gRPC Server", "gRPC", "API для BFF Gateway")
+    Component(device_manager, "Device Manager", "Бизнес-логика", "Управление устройствами")
+    Component(device_repository, "Device Repository", "Data Access", "Доступ к данным устройств")
+    Component(event_handler, "Event Handler", "AMQP", "Работа с событиями")
+}
+
+ContainerDb(device_db, "Device Database", "PostgreSQL", "Хранит устройства, конфигурации")
+Container_Ext(bff_gateway, "BFF Gateway", "Go/Java", "Клиент для веб/мобильных приложений")
+Container_Ext(device_discovery, "Device Discovery", "Go", "Сервис обнаружения")
+Container_Ext(event_broker, "Event Message Broker", "RabbitMQ/Kafka", "Брокер событий")
+
+Rel(bff_gateway, grpc_server, "Запросы данных устройств", "gRPC")
+Rel(device_discovery, grpc_server, "Регистрация новых модулей", "gRPC")
+Rel(grpc_server, device_manager, "Обработка запросов", "")
+Rel(device_manager, device_repository, "Операции с данными", "")
+Rel(device_repository, device_db, "SQL запросы", "SQL")
+Rel(device_manager, event_handler, "Генерация событий", "")
+Rel(event_handler, event_broker, "Публикует команды устройств", "AMQP")
+Rel(event_broker, event_handler, "Подписывается на состояние устройств", "AMQP")
+@enduml

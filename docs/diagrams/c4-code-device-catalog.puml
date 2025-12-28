@@ -1,0 +1,61 @@
+@startuml
+package "Device Catalog" {
+    class DeviceGrpcServer {
+        - service: DeviceManager
+        + GetDevice()
+        + SendCommand()
+        + RegisterModule()
+    }
+
+    class DeviceManager {
+        - repository: DeviceRepository
+        - eventHandler: EventHandler
+        + getDevice(id)
+        + sendCommand(id, command)
+        + registerModule(module)
+    }
+
+    class DeviceRepository {
+        - dataSource: database
+        + get(id)
+        + create(device)
+        + updateStatus(id, status)
+    }
+
+    class EventHandler {
+        - publisher: EventPublisher
+        + publishCommand(deviceId, cmd)
+        + subscribeToEventTopic(handler)
+    }
+
+    class Device {
+        - id: string
+        - name: string
+        - type: string
+        - status: string
+    }
+
+    class DeviceCommand {
+        - deviceId: string
+        - command: string
+        - parameters: map
+    }
+}
+
+DeviceGrpcServer --> DeviceManager
+DeviceManager --> DeviceRepository
+DeviceManager --> EventHandler
+DeviceManager --> Device
+DeviceManager --> DeviceCommand
+DeviceRepository --> Device
+
+class BFFGateway
+class DeviceDiscovery
+class PostgreSQL
+class RabbitMQ
+
+BFFGateway --> DeviceGrpcServer
+DeviceDiscovery --> DeviceGrpcServer
+DeviceRepository --> PostgreSQL
+EventHandler --> RabbitMQ
+@enduml

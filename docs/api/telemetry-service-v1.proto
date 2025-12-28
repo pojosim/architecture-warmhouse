@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package api.v1;
+
+import "google/protobuf/timestamp.proto";
+
+service TelemetryService {
+  // Для BFF Gateway
+  rpc GetTelemetryData(GetTelemetryDataRequest) returns (TelemetryDataResponse);
+  rpc GetLatestTelemetry(GetLatestTelemetryRequest) returns (LatestTelemetryResponse);
+  rpc GetTelemetryHistory(GetTelemetryHistoryRequest) returns (TelemetryHistoryResponse);
+}
+
+// Запросы от BFF
+message GetTelemetryDataRequest {
+  string device_id = 1;
+  google.protobuf.Timestamp start_time = 2;
+  google.protobuf.Timestamp end_time = 3;
+  repeated string metrics = 4;
+}
+
+message GetLatestTelemetryRequest {
+  repeated string device_ids = 1;
+  repeated string metrics = 2;
+}
+
+message GetTelemetryHistoryRequest {
+  string device_id = 1;
+  string metric = 2;
+  google.protobuf.Timestamp start_time = 3;
+  google.protobuf.Timestamp end_time = 4;
+  int32 limit = 5;
+}
+
+message TelemetryDataResponse {
+  repeated TelemetryDataPoint data_points = 1;
+}
+
+message LatestTelemetryResponse {
+  map<string, TelemetryDataPoint> latest_data = 1;
+}
+
+message TelemetryHistoryResponse {
+  repeated TelemetryDataPoint history = 1;
+}
+
+message TelemetryDataPoint {
+  string device_id = 1;
+  string metric = 2;
+  double value = 3;
+  string unit = 4;
+  google.protobuf.Timestamp timestamp = 5;
+}

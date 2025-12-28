@@ -1,0 +1,23 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(device_controller, "Device Controller", "Go", "Управление устройствами")
+
+Container(device_controller, "Device Controller") {
+    Component(event_consumer, "Event Consumer", "AMQP", "Получение команд от брокера")
+    Component(command_executor, "Command Executor", "Бизнес-логика", "Выполнение команд")
+    Component(mqtt_client, "MQTT Client", "MQTT", "Клиент для MQTT брокера")
+    Component(state_publisher, "State Publisher", "AMQP", "Публикация состояния устройств")
+}
+
+Container_Ext(event_broker, "Event Message Broker", "RabbitMQ/Kafka", "Брокер событий")
+Container_Ext(smart_module, "Модуль управления", "Проприетарная", "Локальный MQTT брокер")
+
+Rel(event_broker, event_consumer, "Подписывается на команды устройств", "AMQP")
+Rel(event_consumer, command_executor, "Передает команды", "")
+Rel(command_executor, mqtt_client, "Выполняет команду через MQTT", "")
+Rel(mqtt_client, smart_module, "Отправка команд", "MQTT")
+Rel(smart_module, mqtt_client, "Отправка данных, публикация состояний", "MQTT")
+Rel(mqtt_client, state_publisher, "Полученные состояния", "")
+Rel(state_publisher, event_broker, "Публикует события и состояние устройств", "AMQP")
+@enduml

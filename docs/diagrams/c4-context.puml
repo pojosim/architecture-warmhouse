@@ -1,0 +1,14 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(user, "Пользователь", "Управляет отоплением через веб-интерфейс")
+
+System(application, "Приложение 'Тёплый Дом'", "Приложение управляет отоплением и температурой")
+
+System_Ext(sensor, "Датчик температуры", "Аппаратный датчик в доме пользователя")
+System_Ext(relay, "Реле отопления", "Аппаратное реле в доме пользователя")
+
+Rel(user, application, "Использует", "HTTP/REST")
+Rel(application, sensor, "Запрашивает температуру", "HTTP/проприетарный протокол")
+Rel(application, relay, "Отправляет команды для переключения реле", "HTTP/проприетарный протокол")
+@enduml
