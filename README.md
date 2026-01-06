@@ -71,41 +71,62 @@
 - Только вертикальное масштабирование.
 - Отсутствие гибкости, невозможно масштабировать отдельные функциональные модули приложения.
 
-### 5. Визуализация контекста системы — диаграмма С4
+### 5. Визуализация контекста системы (c4-context)
 
-[C4-Context](docs/images/c4-context.png)
+![C4-Context](docs/images/c4-context.png)
+
 
 # Задание 2. Проектирование микросервисной архитектуры
 
 В этом задании вам нужно предоставить только диаграммы в модели C4. Мы не просим вас отдельно описывать получившиеся микросервисы и то, как вы определили взаимодействия между компонентами To-Be системы. Если вы правильно подготовите диаграммы C4, они и так это покажут.
 
-**Диаграмма контейнеров (Containers)**
+## Диаграмма контейнеров (C4-Containers)
 
-[C4-Containers](docs/images/c4-containers.png)
+![C4-Containers](docs/images/c4-containers.png)
 
-**Диаграмма компонентов (Components)**
 
-[C4 Component BFF Gateway](docs/images/c4-component-bff-gateway.png)
+## Диаграмма компонентов (Components)
 
-[C4 Component Device Catalog](docs/images/с4-component-device-catalog.png)
+### C4 Component BFF Gateway
 
-[C4 Component Device Controller](docs/images/c4-component-device-controller.png)
+![C4 Component BFF Gateway](docs/images/c4-component-bff-gateway.png)
 
-[C4 Component Automation Service](docs/images/c4-component-automation-service.png)
+### C4 Component Device Catalog
 
-[C4 Component Telemetry Service](docs/images/c4-component-telemetry-service.png)
+![C4 Component Device Catalog](docs/images/с4-component-device-catalog.png)
 
-[C4 Component Auth Service](docs/images/c4-component-auth-service.png)
+### C4 Component Device Controller
 
-[C4 Component Device Discovery](docs/images/c4-component-device-discovery.png)
+![C4 Component Device Controller](docs/images/c4-component-device-controller.png)
 
-**Диаграмма кода (Code)**
+### C4 Component Automation Service
 
-[C4 Code Device Catalog](docs/images/c4-code-device-catalog.png)
+![C4 Component Automation Service](docs/images/c4-component-automation-service.png)
+
+### C4 Component Telemetry Service
+
+![C4 Component Telemetry Service](docs/images/c4-component-telemetry-service.png)
+
+### C4 Component Auth Service
+
+![C4 Component Auth Service](docs/images/c4-component-auth-service.png)
+
+### C4 Component Device Discovery
+
+![C4 Component Device Discovery](docs/images/c4-component-device-discovery.png)
+
+## Диаграмма кода (C4-Code)
+
+### C4 Code Device Catalog
+
+![C4 Code Device Catalog](docs/images/c4-code-device-catalog.png)
 
 # Задание 3. Разработка ER-диаграммы
 
-[ER-диаграмма](docs/images/er-diagram.png)
+### ER-диаграммаER-диаграмма
+
+![ER-диаграмма](docs/images/er-diagram.png)
+
 
 # Задание 4. Создание и документирование API
 
